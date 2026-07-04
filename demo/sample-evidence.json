@@ -1,0 +1,37 @@
+{
+  "items": [
+    {
+      "id": "ev-activity",
+      "source": "activity-feed",
+      "kind": "activity-log",
+      "observedAt": "2026-07-01T00:00:00.000Z",
+      "data": {
+        "repo_url": "https://example.org/acme/widget",
+        "commits_90d": 42,
+        "contributor_count": 3,
+        "uptime_pct": 98.2
+      }
+    },
+    {
+      "id": "ev-config",
+      "source": "control-plane",
+      "kind": "control-config",
+      "observedAt": "2026-07-01T00:00:00.000Z",
+      "data": {
+        "mfa_enabled": false,
+        "region": "us-central"
+      }
+    },
+    {
+      "id": "ev-scan",
+      "source": "scanner",
+      "kind": "vuln-scan",
+      "observedAt": "2025-01-15T00:00:00.000Z",
+      "data": {
+        "last_scan_result": "clean",
+        "critical_findings": 0
+      }
+    }
+  ],
+  "failures": []
+}

@@ -1,0 +1,6 @@
+*.log
+.meridian-keys/
+.receipts/
+bun.lock
+demo-output/
+node_modules/

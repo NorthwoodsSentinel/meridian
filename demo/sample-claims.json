@@ -1,0 +1,49 @@
+[
+  {
+    "id": "c1-commits",
+    "text": "The project had at least 20 commits in the last 90 days.",
+    "selfReported": false,
+    "assertion": { "kind": "atLeast", "field": "commits_90d", "value": 20 }
+  },
+  {
+    "id": "c2-mfa",
+    "text": "Multi-factor authentication is enabled for all administrative access.",
+    "selfReported": true,
+    "assertion": { "kind": "equals", "field": "mfa_enabled", "value": true }
+  },
+  {
+    "id": "c3-uptime",
+    "text": "The service maintained at least 99.9% uptime over the reporting period.",
+    "selfReported": true,
+    "assertion": { "kind": "atLeast", "field": "uptime_pct", "value": 99.9 }
+  },
+  {
+    "id": "c4-scan-fresh",
+    "text": "The security control was scanned for vulnerabilities within the last 30 days.",
+    "selfReported": true,
+    "assertion": { "kind": "freshWithinDays", "field": "last_scan_result", "days": 30 }
+  },
+  {
+    "id": "c5-users",
+    "text": "Over 5000 active users rely on the platform daily.",
+    "selfReported": true,
+    "assertion": { "kind": "atLeast", "field": "active_users", "value": 5000 }
+  },
+  {
+    "id": "c6-idp",
+    "text": "The project integrates with the internal identity provider.",
+    "selfReported": true
+  },
+  {
+    "id": "c7-maintainers",
+    "text": "There are exactly 3 maintainers on the project.",
+    "selfReported": false,
+    "assertion": { "kind": "equals", "field": "contributor_count", "value": 3 }
+  },
+  {
+    "id": "c8-repo",
+    "text": "The project has a tracked source repository.",
+    "selfReported": false,
+    "assertion": { "kind": "exists", "field": "repo_url" }
+  }
+]

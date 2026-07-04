@@ -1,0 +1,20 @@
+{
+  "name": "meridian",
+  "version": "0.1.0",
+  "description": "Domain-agnostic adversarial-verification engine core: challenge every claim against pluggable evidence, emit a confidence-scored, ed25519-signed verification result with an auditable execution log.",
+  "type": "module",
+  "license": "Apache-2.0",
+  "private": true,
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "demo": "bun run demo/demo.ts",
+    "test": "bun test",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@types/bun": "^1.3.14",
+    "typescript": "^6.0.3"
+  }
+}
