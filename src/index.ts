@@ -64,6 +64,27 @@ export type { EvidenceAdapter, EvidenceQuery } from "./evidence/adapter.ts";
 export { LocalJsonEvidenceAdapter } from "./evidence/localJson.ts";
 export type { LocalJsonSource } from "./evidence/localJson.ts";
 
+// Rhizome-membership adapter (cooperative trust)
+export {
+  RhizomeMembershipAdapter,
+  buildMembershipClaims,
+} from "./evidence/rhizome.ts";
+export type {
+  MemberSubstrateSource,
+  SelfReportedMetric,
+  BuildMembershipClaimsOptions,
+} from "./evidence/rhizome.ts";
+export {
+  DEFAULT_MEMBERSHIP_POLICY,
+} from "./rhizome/types.ts";
+export type {
+  MemberSubstrate,
+  PeerAttestation,
+  ContributionReceipt,
+  ParticipationLog,
+  MembershipPolicy,
+} from "./rhizome/types.ts";
+
 // Receipt store
 export type { ReceiptStore } from "./store/receiptStore.ts";
 export { JsonFileReceiptStore } from "./store/jsonFileStore.ts";
