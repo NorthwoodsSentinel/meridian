@@ -1,0 +1,24 @@
+{
+  "memberId": "birch",
+  "peerAttestations": [
+    {
+      "voucher": "cedar",
+      "subject": "birch",
+      "statement": "Met Birch once at an onboarding call. Seemed fine.",
+      "observedAt": "2026-02-02T12:00:00.000Z"
+    }
+  ],
+  "contributionReceipts": [
+    {
+      "what": "Fixed a typo in the co-op charter.",
+      "receiptHash": "sha256:0011ab-charter-typo",
+      "observedAt": "2026-01-10T08:00:00.000Z"
+    }
+  ],
+  "participationLogs": [
+    {
+      "activity": "Lurked in the governance channel",
+      "observedAt": "2026-06-20T20:00:00.000Z"
+    }
+  ]
+}

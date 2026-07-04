@@ -1,0 +1,51 @@
+{
+  "memberId": "aspen",
+  "peerAttestations": [
+    {
+      "voucher": "cedar",
+      "subject": "aspen",
+      "statement": "Aspen reviewed our grant substrate and caught two provenance gaps nobody else saw.",
+      "observedAt": "2026-06-28T14:00:00.000Z"
+    },
+    {
+      "voucher": "willow",
+      "subject": "aspen",
+      "statement": "Reliable on every shared build. Ships what she says she'll ship.",
+      "observedAt": "2026-06-15T09:30:00.000Z"
+    },
+    {
+      "voucher": "birch",
+      "subject": "aspen",
+      "statement": "Onboarded me to the co-op tooling with real patience.",
+      "observedAt": "2026-05-20T18:45:00.000Z"
+    },
+    {
+      "voucher": "sorrel",
+      "subject": "aspen",
+      "statement": "Carried the mutual-aid rota for a month while I was out.",
+      "observedAt": "2026-06-30T11:15:00.000Z"
+    }
+  ],
+  "contributionReceipts": [
+    {
+      "what": "Wrote the co-op's evidence-normalization spec.",
+      "receiptHash": "sha256:9f1c0b2a-spec-normalization",
+      "observedAt": "2026-06-25T16:20:00.000Z"
+    },
+    {
+      "what": "Ran two onboarding sessions for new members.",
+      "receiptHash": "sha256:44ad12ee-onboarding",
+      "observedAt": "2026-05-30T13:00:00.000Z"
+    }
+  ],
+  "participationLogs": [
+    {
+      "activity": "Weekly governance call",
+      "observedAt": "2026-07-01T17:00:00.000Z"
+    },
+    {
+      "activity": "Reviewed a peer's contribution receipt",
+      "observedAt": "2026-06-22T10:00:00.000Z"
+    }
+  ]
+}
