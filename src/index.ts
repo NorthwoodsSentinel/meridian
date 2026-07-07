@@ -80,6 +80,11 @@ export {
 // Live Cistern loader — the production wire (Cistern intake → Meridian trust)
 export { cisternMemberLoader } from "./evidence/cistern.ts";
 export type { CisternLoaderConfig } from "./evidence/cistern.ts";
+
+// Value-routing (Shapley) — the economic layer on top of trust
+export { shapleyValues, MAX_EXACT_PLAYERS } from "./value/shapley.ts";
+export { additiveValue, quorumGatedValue, distributePayout } from "./value/coop.ts";
+export type { Contributor, CoopValueFn, PayoutShare } from "./value/coop.ts";
 export type {
   MemberSubstrate,
   PeerAttestation,
