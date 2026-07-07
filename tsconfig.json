@@ -16,5 +16,5 @@
     "types": ["bun"],
     "lib": ["ESNext"]
   },
-  "include": ["src", "demo", "tests"]
+  "include": ["src", "demo", "demo-audit", "demo-rhizome", "tests"]
 }

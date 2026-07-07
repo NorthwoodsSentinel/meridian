@@ -62,6 +62,9 @@ const engine = new MeridianEngine({
   strategy: new RuleBasedChallengeStrategy(),
   signer,
   store,
+  // Paid audit: an unobserved control earns NO trust (not half credit) — a
+  // client can't inflate their score by simply omitting evidence.
+  unresolvedWeight: 0,
 });
 
 const result = await runVerification({

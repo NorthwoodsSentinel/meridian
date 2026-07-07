@@ -5,8 +5,8 @@
  * is the payoff of dropping the chain: verification is pure local crypto.
  */
 import type { VerificationResult } from "./types.ts";
-import { canonicalize, verifySignature } from "./signing.ts";
-import { buildResultDigest } from "./engine.ts";
+import { verifySignature } from "./signing.ts";
+import { buildResultDigest, buildObjectionMessage } from "./engine.ts";
 
 export type ResultVerification = {
   /** The top-level result signature is valid over its digest. */
@@ -21,12 +21,14 @@ export function verifyResult(result: VerificationResult): ResultVerification {
   const resultValid = verifySignature(result.signature, buildResultDigest(result));
 
   const objectionResults = result.signedObjections.map((obj) => {
-    const message = canonicalize({
+    const message = buildObjectionMessage({
       runId: result.runId,
       claimId: obj.claimId,
       challengeType: obj.challengeType,
-      verdict: result.outcomes.find((o) => o.claimId === obj.claimId)?.verdict ?? null,
+      verdict: result.outcomes.find((o) => o.claimId === obj.claimId)?.verdict ?? "",
       objection: obj.objection,
+      challengeEvidence: obj.challengeEvidence,
+      confidence: obj.confidence,
       issuedAt: obj.issuedAt,
     });
     return { claimId: obj.claimId, valid: verifySignature(obj.signature, message) };

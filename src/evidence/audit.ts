@@ -203,7 +203,21 @@ export function controlToClaim(control: SecurityControl): Claim {
  * receipt. Mirrors `buildMembershipClaims` for the Rhizome adapter.
  */
 export function buildAuditClaims(controlSet: ControlSet): Claim[] {
-  return controlSet.controls.map(controlToClaim);
+  return controlSet.controls.map((control) => {
+    try {
+      return controlToClaim(control);
+    } catch {
+      // Unknown requirement kind from untrusted input → an assertion-less claim
+      // the strategy resolves as unresolved, never an aborted audit (mirrors the
+      // collect()-side category tolerance).
+      return {
+        id: control.id,
+        text: control.name,
+        selfReported: control.selfReported ?? false,
+        attributes: { controlId: control.id, category: control.category, check: "security-control" },
+      };
+    }
+  });
 }
 
 export class EvidenceAuditAdapter implements EvidenceAdapter {
@@ -243,6 +257,20 @@ export class EvidenceAuditAdapter implements EvidenceAdapter {
       const obs = control.observation;
       if (obs === undefined) continue; // unobserved control contributes no evidence
 
+      // Untrusted input (filePath/load sources are `as ControlSet` casts): an
+      // unrecognized category must degrade THIS control to a recorded failure,
+      // never throw and abort the whole audit (the docstring's contract).
+      let kind: string;
+      try {
+        kind = evidenceKindForCategory(control.category);
+      } catch (err) {
+        failures.push({
+          source: `evidence-audit:${control.id}`,
+          reason: err instanceof Error ? err.message : String(err),
+        });
+        continue; // no evidence emitted → this control's claim resolves as unresolved
+      }
+
       const priorOwner = fieldOwner.get(control.field);
       if (priorOwner !== undefined) {
         // Two observed controls share a field: findField would bind a claim to the
@@ -259,7 +287,7 @@ export class EvidenceAuditAdapter implements EvidenceAdapter {
       items.push({
         id: randomUUID(),
         source: obs.source ?? `audit:${control.category}`,
-        kind: evidenceKindForCategory(control.category),
+        kind,
         observedAt: obs.observedAt,
         // Shape matches controlToEvidenceData(control) — kept inline so the item
         // build reads straight through without a null-narrowing dance.

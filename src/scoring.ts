@@ -38,15 +38,18 @@ export function round2(n: number): number {
 }
 
 /**
- * Trust score for the claim set. Verified claims count fully, unresolved count
- * half, flagged count zero. Empty set scores 0 (nothing verified).
+ * Trust score for the claim set. Verified claims count fully, flagged count
+ * zero, and unresolved count `unresolvedWeight` (default 0.5 = kredence parity).
+ * A paid audit passes 0 so an unobserved control earns no credit. Empty set
+ * scores 0 (nothing verified).
  */
 export function computeConfidenceScore(
   outcomes: ReadonlyArray<{ verdict: Verdict }>,
+  unresolvedWeight: number = 0.5,
 ): number {
   const { verifiedCount, unresolvedCount, total } = tallyVerdicts(outcomes);
   if (total === 0) return 0;
-  return round2((verifiedCount + 0.5 * unresolvedCount) / total);
+  return round2((verifiedCount + unresolvedWeight * unresolvedCount) / total);
 }
 
 /**

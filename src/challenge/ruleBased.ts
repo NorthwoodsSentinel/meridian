@@ -30,6 +30,12 @@ const CONFIDENCE = {
   typeMismatch: 0.4,
 } as const;
 
+/** Regex-safety caps for the `matches` assertion (bound backtracking on untrusted input). */
+const MAX_PATTERN_LENGTH = 200;
+const MAX_MATCH_VALUE_LENGTH = 4096;
+/** Grace for clock skew before a future-dated observation is treated as invalid (days). */
+const FUTURE_DATE_TOLERANCE_DAYS = 1;
+
 /** A claim "states a metric" if its text contains a digit (a number, percentage, count). */
 function statesMetric(text: string): boolean {
   return /\d/.test(text);
@@ -85,6 +91,16 @@ export class RuleBasedChallengeStrategy implements ChallengeStrategy {
     const { value, item } = hit;
     const cite = `evidence "${item.kind}" (source: ${item.source}, observed ${item.observedAt}) reports ${assertion.field}=${JSON.stringify(value)}`;
 
+    // Conflicting evidence: more than one source reports this field with a
+    // different value. Taking the first would let a failing observation hide
+    // behind a passing sibling — flag it so the disagreement reaches the verdict.
+    if (hit.conflict) {
+      return this.#make(claim, "flagged", "contradicted", CONFIDENCE.contradicted, {
+        challengeEvidence: `Conflicting evidence for "${assertion.field}": multiple sources disagree; first cited is ${cite}.`,
+        objection: `Conflicting evidence: more than one source reports "${assertion.field}" with different values, so the claim cannot be verified. Resolve the disagreement or give each control a distinct field.`,
+      });
+    }
+
     switch (assertion.kind) {
       case "exists":
         return this.#make(claim, "verified", "unsupported", CONFIDENCE.verified, {
@@ -137,6 +153,16 @@ export class RuleBasedChallengeStrategy implements ChallengeStrategy {
         if (typeof value !== "string") {
           return this.#typeMismatch(claim, assertion.field, value, "string");
         }
+        // Both pattern and value come from the (semi-trusted) control set. Cap
+        // their length to bound regex backtracking — a catastrophic pattern must
+        // not hang an engine advertised as safe to run unsupervised. Fails safe
+        // (unresolved), never a false-verify.
+        if (assertion.pattern.length > MAX_PATTERN_LENGTH) {
+          return this.#make(claim, "unresolved", "vague", CONFIDENCE.unresolved, {
+            challengeEvidence: `Match pattern is ${assertion.pattern.length} chars, over the ${MAX_PATTERN_LENGTH}-char safety limit; not evaluated.`,
+            objection: `Cannot evaluate: the claim's match pattern exceeds the ${MAX_PATTERN_LENGTH}-character safety limit and was not run.`,
+          });
+        }
         let re: RegExp;
         try {
           re = new RegExp(assertion.pattern);
@@ -146,7 +172,8 @@ export class RuleBasedChallengeStrategy implements ChallengeStrategy {
             objection: `Cannot evaluate: the claim's match pattern "${assertion.pattern}" is invalid.`,
           });
         }
-        return re.test(value)
+        const tested = value.length > MAX_MATCH_VALUE_LENGTH ? value.slice(0, MAX_MATCH_VALUE_LENGTH) : value;
+        return re.test(tested)
           ? this.#make(claim, "verified", "contradicted", CONFIDENCE.verified, {
               challengeEvidence: `Pattern matched: ${cite} matches /${assertion.pattern}/.`,
               objection: null,
@@ -159,14 +186,24 @@ export class RuleBasedChallengeStrategy implements ChallengeStrategy {
 
       case "freshWithinDays": {
         const age = ageInDays(item.observedAt);
-        return age <= assertion.days
+        // A future-dated observation (age negative beyond clock-skew grace) must
+        // not satisfy a freshness check — otherwise a stale control is masked by
+        // setting its timestamp in the future. Treat it as a data-integrity flag.
+        if (age < -FUTURE_DATE_TOLERANCE_DAYS) {
+          return this.#make(claim, "flagged", "stale", CONFIDENCE.contradicted, {
+            challengeEvidence: `Future-dated: ${cite}, timestamp is ${Math.abs(age)} day(s) in the future.`,
+            objection: `Future-dated evidence: the supporting evidence for ${assertion.field} carries a timestamp ${Math.abs(age)} days in the future and cannot establish freshness.`,
+          });
+        }
+        const effectiveAge = Math.max(0, age);
+        return effectiveAge <= assertion.days
           ? this.#make(claim, "verified", "stale", CONFIDENCE.verified, {
-              challengeEvidence: `Fresh: ${cite}, observed ${age} day(s) ago ≤ ${assertion.days}.`,
+              challengeEvidence: `Fresh: ${cite}, observed ${effectiveAge} day(s) ago ≤ ${assertion.days}.`,
               objection: null,
             })
           : this.#make(claim, "flagged", "stale", CONFIDENCE.contradicted, {
-              challengeEvidence: `Stale: ${cite}, observed ${age} day(s) ago > ${assertion.days}.`,
-              objection: `Stale evidence: the supporting evidence for ${assertion.field} was observed ${age} days ago, exceeding the claimed freshness window of ${assertion.days} days.`,
+              challengeEvidence: `Stale: ${cite}, observed ${effectiveAge} day(s) ago > ${assertion.days}.`,
+              objection: `Stale evidence: the supporting evidence for ${assertion.field} was observed ${effectiveAge} days ago, exceeding the claimed freshness window of ${assertion.days} days.`,
             });
       }
 

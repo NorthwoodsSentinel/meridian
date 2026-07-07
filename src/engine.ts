@@ -37,6 +37,12 @@ export type EngineOptions = {
   tools?: ToolRegistry;
   /** Optional persistence for results + signed objections. */
   store?: ReceiptStore;
+  /**
+   * Weight an unresolved verdict contributes to the confidence score (0..1).
+   * Defaults to 0.5 (kredence parity — co-op unchanged). A paid audit should set
+   * this to 0 so "no evidence" earns no trust rather than half credit.
+   */
+  unresolvedWeight?: number;
   /** Optional live log listener (dashboard / progress notify). */
   onLog?: LogListener;
   /** Mirror the execution log to the console. Default false. */
@@ -51,28 +57,69 @@ export type VerifyInput = {
 };
 
 /**
+ * Receipt binding version. Bump when the signed digest / objection message shape
+ * changes so an old receipt can't be re-verified against new binding rules (and
+ * vice-versa) — the version is part of the signed bytes, so a mismatch fails
+ * verification loudly instead of silently mis-validating.
+ */
+export const RECEIPT_VERSION = 2;
+
+/**
  * The stable subset of a result that the signature covers. A verifier
  * reconstructs this from the returned result and checks it against the
- * signature — so tampering with any verdict, type, or the score is detectable.
+ * signature — so tampering with any verdict, type, score, the human-readable
+ * subject, or a claim's text is detectable.
  */
 export function buildResultDigest(
   result: Pick<
     VerificationResult,
-    "runId" | "subjectId" | "adapterId" | "strategyId" | "confidenceScore" | "outcomes"
+    "runId" | "subject" | "subjectId" | "adapterId" | "strategyId" | "confidenceScore" | "outcomes"
   >,
 ): string {
   return canonicalize({
+    v: RECEIPT_VERSION,
     runId: result.runId,
+    subject: result.subject,
     subjectId: result.subjectId,
     adapterId: result.adapterId,
     strategyId: result.strategyId,
     confidenceScore: result.confidenceScore,
     outcomes: result.outcomes.map((o) => ({
       claimId: o.claimId,
+      claimText: o.claimText,
       verdict: o.verdict,
       challengeType: o.challengeType,
       confidence: o.confidence,
     })),
+  });
+}
+
+/**
+ * The signed bytes of a detached objection. Built here and reused by verify.ts
+ * so the sign path and the re-verify path cannot drift. Binds the cited evidence
+ * text and confidence in addition to the verdict — a receipt consumer treats
+ * those as authoritative, so they must be tamper-evident.
+ */
+export function buildObjectionMessage(fields: {
+  runId: string;
+  claimId: string;
+  challengeType: string;
+  verdict: string;
+  objection: string;
+  challengeEvidence: string;
+  confidence: number;
+  issuedAt: string;
+}): string {
+  return canonicalize({
+    v: RECEIPT_VERSION,
+    runId: fields.runId,
+    claimId: fields.claimId,
+    challengeType: fields.challengeType,
+    verdict: fields.verdict,
+    objection: fields.objection,
+    challengeEvidence: fields.challengeEvidence,
+    confidence: fields.confidence,
+    issuedAt: fields.issuedAt,
   });
 }
 
@@ -136,12 +183,14 @@ export class MeridianEngine {
       if (outcome.verdict !== "verified") {
         const objection = outcome.objection ?? "Flagged — see challenge evidence.";
         const issuedAt = new Date().toISOString();
-        const message = canonicalize({
+        const message = buildObjectionMessage({
           runId,
           claimId: outcome.claimId,
           challengeType: outcome.challengeType,
           verdict: outcome.verdict,
           objection,
+          challengeEvidence: outcome.challengeEvidence,
+          confidence: outcome.confidence,
           issuedAt,
         });
         log.log("info", "sign", "objection:signing", { claimId: outcome.claimId });
@@ -159,7 +208,7 @@ export class MeridianEngine {
 
     // ── 3: score ─────────────────────────────────────────────────────────────
     const tally = tallyVerdicts(outcomes);
-    const confidenceScore = computeConfidenceScore(outcomes);
+    const confidenceScore = computeConfidenceScore(outcomes, this.#opts.unresolvedWeight ?? 0.5);
     log.log("info", "score", "score:computed", {
       verified: tally.verifiedCount,
       flagged: tally.flaggedCount,
@@ -170,6 +219,7 @@ export class MeridianEngine {
     // ── 4: sign the whole result digest ──────────────────────────────────────
     const digestSource = {
       runId,
+      subject: input.subject,
       subjectId: input.evidence.subjectId,
       adapterId: input.evidence.adapterId,
       strategyId: strategy.id,
