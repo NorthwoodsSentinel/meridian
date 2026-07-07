@@ -107,6 +107,25 @@ demo/                    runnable demo + sample claims/evidence
 tests/                   52 unit/integration tests
 ```
 
+## Deployed / released
+
+- **v0.1.0** — 2026-07-06. First real thing plugged into the engine: the Rhizome
+  cooperative-trust layer (`RHIZOME-WIRING.md`, `src/rhizome/`, `demo-rhizome/`).
+- Repo: `github.com/NorthwoodsSentinel/meridian` (private). 65 tests green.
+- Meridian is a **library, not a service** — "shipping" it is a tagged release plus a
+  consumer, not a `wrangler deploy`. The consumer is the demo (two members run end to
+  end: one clean receipt, one flagged with signed offline-verifiable objections) and
+  any co-op that re-checks a portable receipt via `verifyResult()`.
+
+## Lessons (2026-07-06 release)
+
+- **Push private first.** A built, tested, tagged repo ships to a private
+  `NorthwoodsSentinel/<name>` by default; public is a separate, later call.
+- **Keys stay out of git.** `.meridian-keys/signer.key` (the ed25519 signing key) is
+  gitignored and was never tracked — verified before the first push.
+- **Not every "ship" is a deploy.** A library ships as a release + a wired consumer;
+  forcing a service-shaped deploy onto it is the wrong close.
+
 ## License
 
 Apache-2.0.
