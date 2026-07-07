@@ -1,0 +1,89 @@
+{
+  "systemId": "acme-prod",
+  "label": "Acme Corp — production environment security audit",
+  "controls": [
+    {
+      "id": "IA-2",
+      "name": "MFA is enforced for all administrator accounts.",
+      "category": "identity",
+      "field": "mfa_enforced",
+      "claimed": { "kind": "equals", "value": true },
+      "observation": {
+        "value": true,
+        "observedAt": "2026-07-01T00:00:00.000Z",
+        "source": "okta-idp-export"
+      },
+      "evidenceRef": "okta://policies/mfa-admin"
+    },
+    {
+      "id": "SC-28",
+      "name": "Data at rest is encrypted across all production stores.",
+      "category": "encryption",
+      "field": "encryption_at_rest_enabled",
+      "claimed": { "kind": "equals", "value": true },
+      "observation": {
+        "value": false,
+        "observedAt": "2026-07-01T00:00:00.000Z",
+        "source": "cspm-scan"
+      },
+      "evidenceRef": "cspm://findings/rds-unencrypted"
+    },
+    {
+      "id": "AU-11",
+      "name": "Audit logs are retained for at least 365 days.",
+      "category": "logging",
+      "field": "log_retention_days",
+      "claimed": { "kind": "atLeast", "value": 365 },
+      "observation": {
+        "value": 400,
+        "observedAt": "2026-07-01T00:00:00.000Z",
+        "source": "siem-config"
+      }
+    },
+    {
+      "id": "RA-5",
+      "name": "There are zero open critical vulnerabilities.",
+      "category": "vuln-mgmt",
+      "field": "critical_vuln_count",
+      "claimed": { "kind": "atMost", "value": 0 },
+      "observation": {
+        "value": 3,
+        "observedAt": "2026-07-01T00:00:00.000Z",
+        "source": "vuln-scanner"
+      },
+      "evidenceRef": "scanner://reports/2026-07-01"
+    },
+    {
+      "id": "VM-2",
+      "name": "A vulnerability scan has run within the last 30 days.",
+      "category": "vuln-mgmt",
+      "field": "last_vuln_scan",
+      "claimed": { "kind": "freshWithinDays", "days": 30 },
+      "observation": {
+        "value": "full authenticated scan completed",
+        "observedAt": "PATCHED_AT_RUNTIME",
+        "source": "vuln-scanner"
+      }
+    },
+    {
+      "id": "CP-9",
+      "name": "A backup restore has been tested within the last 90 days.",
+      "category": "resilience",
+      "field": "last_backup_test",
+      "claimed": { "kind": "freshWithinDays", "days": 90 },
+      "observation": {
+        "value": "restore drill: partial success",
+        "observedAt": "PATCHED_AT_RUNTIME",
+        "source": "dr-runbook"
+      }
+    },
+    {
+      "id": "AC-2",
+      "name": "Least-privilege access reviews cover 100% of admin roles.",
+      "category": "access",
+      "field": "access_review_coverage",
+      "claimed": { "kind": "atLeast", "value": 100 },
+      "selfReported": true
+    }
+  ]
+}

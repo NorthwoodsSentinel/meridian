@@ -81,6 +81,24 @@ export {
 export { cisternMemberLoader } from "./evidence/cistern.ts";
 export type { CisternLoaderConfig } from "./evidence/cistern.ts";
 
+// Enterprise-audit adapter (the paid security-audit twin of the co-op adapter)
+export {
+  EvidenceAuditAdapter,
+  buildAuditClaims,
+  controlToClaim,
+  controlToEvidenceData,
+  requirementToAssertion,
+  evidenceKindForCategory,
+} from "./evidence/audit.ts";
+export type {
+  ControlCategory,
+  ControlRequirement,
+  ControlObservation,
+  SecurityControl,
+  ControlSet,
+  ControlSetSource,
+} from "./evidence/audit.ts";
+
 // Value-routing (Shapley) — the economic layer on top of trust
 export { shapleyValues, MAX_EXACT_PLAYERS } from "./value/shapley.ts";
 export { additiveValue, quorumGatedValue, distributePayout } from "./value/coop.ts";
