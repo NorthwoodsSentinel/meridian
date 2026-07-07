@@ -74,10 +74,15 @@ layer with its own decisions, and it is deliberately not built yet. Trust first,
 because value-routing that runs on unverified membership is just a nicer-looking
 way to get gamed.
 
-## Three decisions that are Rob's to make
+## Three decisions — DECIDED 2026-07-06 ("execute it")
 
-These are live as current defaults. Each is easy to change — they are data, not
-buried logic.
+Rob green-lit shipping at defaults. Locked, all overridable later (they are data,
+not buried logic):
+- **#1 threshold** → shipped at 3 distinct vouches / 1 contribution / 90-day freshness.
+- **#2 substrate source** → default **Cistern** via the pluggable `load()` loader (the live intake, deployed 2026-07-06). Daemon and ATProto remain drop-in alternatives — a new loader, not a rewrite. Live Cistern-read loader is the one remaining wire (needs a Cistern read endpoint; write-side is live, read-side is the next small seam).
+- **#3 value-routing (Shapley)** → NOT decided-away. It is the named *next build*, deliberately after trust. Unchanged.
+
+Original framing and rationale for each below.
 
 **1. The membership threshold.** Currently a member in good standing needs at
 least 3 distinct peer vouches and at least 1 contribution receipt within the last
@@ -92,9 +97,20 @@ portability story. The adapter is built to not care, so Rob can pick — or run 
 than one — without touching this code. This is a "which substrate" call, not a
 "rewrite the adapter" call.
 
-**3. The value-routing model.** Deferred to the next seam. How trust converts into
-a fair claim on shared value is Rob's design to make once trust is settled in
-practice. Named here so it is not forgotten, not started here so trust lands first.
+**3. The value-routing model.** The next seam to *build*, but no longer an open
+*theoretical* question — it has a named answer: the **Shapley value** (cooperative
+game theory, Lloyd Shapley 1953). It is the provably-unique fair split of a shared
+payout: the four axioms (efficiency, symmetry, null-player, additivity) pin down
+exactly one allocation, so "here is what you are objectively owed" is a theorem, not
+the co-op's opinion — the one promise a platform revenue-share can never make.
+David Dao's PhD *is* Data Shapley plus the efficiency work that makes it tractable
+(exact Shapley is exponential). And the inputs are already here: Meridian's signed
+contribution receipts are exactly what a Shapley computation consumes. So the engine
+is Cistern (intake) → Meridian (trust: whose contribution, is it real, signed) →
+Shapley (value: what it is worth on a payout, signed). Open design question that
+remains: the *value function* — how to measure the product's worth with vs. without
+a given contributor — for code/pattern/substrate, not just the ML-data setting
+David's papers assume. Named here so it lands on the settled trust layer, not before.
 
 ## Files
 
