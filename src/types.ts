@@ -173,10 +173,21 @@ export type VerificationResult = {
   unresolvedCount: number;
   /**
    * 0..1 trust score for the claim set as a whole.
-   * `(verifiedCount + 0.5 * unresolvedCount) / totalClaims`, rounded to 2dp —
-   * kredence's formula, kept for parity. See scoring.ts.
+   * `(verifiedCount + unresolvedWeight * unresolvedCount) / totalClaims`, 2dp.
+   * DERIVED, not authoritative: `verifyResult` re-computes this from `outcomes`
+   * (+ `unresolvedWeight`) and rejects the receipt if the stored value disagrees.
+   * A consumer that trusts this field without calling `verifyResult` is trusting
+   * an unsigned convenience copy — the signed truth is `outcomes`. See scoring.ts.
    */
   confidenceScore: number;
+  /**
+   * The unresolved-verdict weight (0..1) used to compute `confidenceScore`. It is
+   * part of the SIGNED digest so a verifier can deterministically re-derive the
+   * score from the outcomes — without it, the score is not independently
+   * recomputable and "verified" would only mean "the signer's arithmetic was
+   * transmitted intact," never "the arithmetic is correct."
+   */
+  unresolvedWeight: number;
   /** One signed receipt per flagged/unresolved claim. */
   signedObjections: SignedObjection[];
   executionLog: ExecutionLogEntry[];

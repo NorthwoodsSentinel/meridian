@@ -62,18 +62,25 @@ export type VerifyInput = {
  * vice-versa) — the version is part of the signed bytes, so a mismatch fails
  * verification loudly instead of silently mis-validating.
  */
-export const RECEIPT_VERSION = 2;
+export const RECEIPT_VERSION = 3;
 
 /**
- * The stable subset of a result that the signature covers. A verifier
- * reconstructs this from the returned result and checks it against the
- * signature — so tampering with any verdict, type, score, the human-readable
- * subject, or a claim's text is detectable.
+ * The stable subset of a result that the signature covers — the ATOMIC facts
+ * only: the per-claim outcomes and the `unresolvedWeight`. The summary
+ * (`confidenceScore` and the three counts) is deliberately NOT signed here: it
+ * is a pure function of the signed outcomes + weight, so `verifyResult`
+ * re-derives it rather than trusting a stored number. This is what makes a
+ * lying summary ("score 1.0 over all-flagged outcomes") *unverifiable* instead
+ * of merely unlikely — the illegal state cannot pass verification.
+ *
+ * Tampering with any verdict, type, per-claim confidence, the weight, the
+ * subject, or a claim's text is detectable via the signature; tampering with the
+ * summary is detectable via re-derivation.
  */
 export function buildResultDigest(
   result: Pick<
     VerificationResult,
-    "runId" | "subject" | "subjectId" | "adapterId" | "strategyId" | "confidenceScore" | "outcomes"
+    "runId" | "subject" | "subjectId" | "adapterId" | "strategyId" | "unresolvedWeight" | "outcomes"
   >,
 ): string {
   return canonicalize({
@@ -83,7 +90,7 @@ export function buildResultDigest(
     subjectId: result.subjectId,
     adapterId: result.adapterId,
     strategyId: result.strategyId,
-    confidenceScore: result.confidenceScore,
+    unresolvedWeight: result.unresolvedWeight,
     outcomes: result.outcomes.map((o) => ({
       claimId: o.claimId,
       claimText: o.claimText,
@@ -207,8 +214,9 @@ export class MeridianEngine {
     }
 
     // ── 3: score ─────────────────────────────────────────────────────────────
+    const unresolvedWeight = this.#opts.unresolvedWeight ?? 0.5;
     const tally = tallyVerdicts(outcomes);
-    const confidenceScore = computeConfidenceScore(outcomes, this.#opts.unresolvedWeight ?? 0.5);
+    const confidenceScore = computeConfidenceScore(outcomes, unresolvedWeight);
     log.log("info", "score", "score:computed", {
       verified: tally.verifiedCount,
       flagged: tally.flaggedCount,
@@ -223,7 +231,7 @@ export class MeridianEngine {
       subjectId: input.evidence.subjectId,
       adapterId: input.evidence.adapterId,
       strategyId: strategy.id,
-      confidenceScore,
+      unresolvedWeight,
       outcomes,
     };
     const signature = signer.sign(buildResultDigest(digestSource));
@@ -241,6 +249,7 @@ export class MeridianEngine {
       flaggedCount: tally.flaggedCount,
       unresolvedCount: tally.unresolvedCount,
       confidenceScore,
+      unresolvedWeight,
       signedObjections,
       executionLog: log.entries(),
       signature,
