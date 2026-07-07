@@ -77,6 +77,9 @@ export type {
 export {
   DEFAULT_MEMBERSHIP_POLICY,
 } from "./rhizome/types.ts";
+// Live Cistern loader — the production wire (Cistern intake → Meridian trust)
+export { cisternMemberLoader } from "./evidence/cistern.ts";
+export type { CisternLoaderConfig } from "./evidence/cistern.ts";
 export type {
   MemberSubstrate,
   PeerAttestation,
