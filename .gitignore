@@ -4,3 +4,5 @@
 bun.lock
 demo-output/
 node_modules/
+
+.claude/
