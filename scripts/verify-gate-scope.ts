@@ -9,6 +9,7 @@
 import { spawnSync } from "node:child_process";
 import { existsSync, readFileSync } from "node:fs";
 import { relative, resolve } from "node:path";
+import ts from "typescript";
 import config from "../vitest.config.ts";
 
 const root = resolve(import.meta.dirname, "..");
@@ -31,12 +32,24 @@ const tracked = run("git", [
 if (!tracked.length)
   throw new Error("verify-gate-scope: found no .ts files at all; the check itself is broken");
 
-// 1. typecheck scope. Run the repo's own tsc directly, and treat an empty listing as a broken check.
-const tsc = resolve(root, "node_modules/.bin/tsc");
-if (!existsSync(tsc)) throw new Error(`verify-gate-scope: ${tsc} not found; run bun install`);
-const listed = run(tsc, ["-p", "tsconfig.json", "--listFilesOnly"]);
+// 1. typecheck scope. Read the tsconfig file list in-process through the TypeScript API (the same
+// parse `tsc -p tsconfig.json` does), and treat an empty list as a broken check.
+const configPath = resolve(root, "tsconfig.json");
+const read = ts.readConfigFile(configPath, (path) => ts.sys.readFile(path));
+if (read.error)
+  throw new Error(
+    `verify-gate-scope: cannot read tsconfig.json: ${ts.flattenDiagnosticMessageText(read.error.messageText, "\n")}`,
+  );
+const parsed = ts.parseJsonConfigFileContent(read.config, ts.sys, root, undefined, configPath);
+if (parsed.errors.length)
+  throw new Error(
+    `verify-gate-scope: tsconfig.json has errors: ${parsed.errors.map((d) => ts.flattenDiagnosticMessageText(d.messageText, "\n")).join("; ")}`,
+  );
+const listed = parsed.fileNames;
 if (!listed.length)
-  throw new Error("verify-gate-scope: tsc listed no files; the check itself is broken");
+  throw new Error(
+    "verify-gate-scope: the tsconfig project lists no files; the check itself is broken",
+  );
 const typed = new Set(listed.map((f) => relative(root, f)));
 const untyped = tracked.filter((f) => !typed.has(f));
 
