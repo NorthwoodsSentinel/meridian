@@ -86,7 +86,8 @@ console.log(`  runId       : ${result.runId}`);
 console.log(`  adapter     : ${result.adapterId}   strategy: ${result.strategyId}`);
 console.log(`  signer (pk) : ${result.signature.publicKey.slice(0, 32)}…`);
 console.log(bar);
-const status = result.flaggedCount === 0 && result.unresolvedCount === 0 ? "PASSED AUDIT" : "GAPS FOUND";
+const status =
+  result.flaggedCount === 0 && result.unresolvedCount === 0 ? "PASSED AUDIT" : "GAPS FOUND";
 console.log(
   `  verified: ${result.verifiedCount}   flagged: ${result.flaggedCount}   unresolved: ${result.unresolvedCount}   ` +
     `→  CONTROL-SET SCORE: ${result.confidenceScore}   [${status}]`,
@@ -94,15 +95,21 @@ console.log(
 console.log(bar);
 
 for (const o of result.outcomes) {
-  console.log(`\n  [${glyph[o.verdict]}] ${o.verdict.toUpperCase()}  (${o.challengeType}, conf ${o.confidence})`);
+  console.log(
+    `\n  [${glyph[o.verdict]}] ${o.verdict.toUpperCase()}  (${o.challengeType}, conf ${o.confidence})`,
+  );
   console.log(`      control  : ${o.claimText}`);
   console.log(`      finding  : ${o.challengeEvidence}`);
   if (o.objection) console.log(`      objection: ${o.objection}`);
 }
 
-console.log(`\n  signed objections (${result.signedObjections.length}) — detached ed25519 receipts:`);
+console.log(
+  `\n  signed objections (${result.signedObjections.length}) — detached ed25519 receipts:`,
+);
 for (const obj of result.signedObjections) {
-  console.log(`    • ${obj.claimId}  [${obj.challengeType}]  sig ${obj.signature.signature.slice(0, 24)}…`);
+  console.log(
+    `    • ${obj.claimId}  [${obj.challengeType}]  sig ${obj.signature.signature.slice(0, 24)}…`,
+  );
 }
 
 const check = verifyResult(result);

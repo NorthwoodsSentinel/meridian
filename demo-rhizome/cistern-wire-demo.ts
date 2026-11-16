@@ -50,7 +50,9 @@ const adapter = new RhizomeMembershipAdapter({ load });
 // Pull the co-op's LIVE governance policy so verification uses the thresholds
 // the co-op currently sets (Wire 4), not hardcoded defaults. Change the policy
 // via PUT /rhizome/policy and the very next verification honors it.
-const polRes = await fetch(`${baseUrl}/rhizome/policy`, { headers: { authorization: `Bearer ${token}` } });
+const polRes = await fetch(`${baseUrl}/rhizome/policy`, {
+  headers: { authorization: `Bearer ${token}` },
+});
 const policy = polRes.ok
   ? ((await polRes.json()) as { minVouches: number; freshnessDays: number })
   : null;
@@ -59,7 +61,9 @@ const result = await runVerification({
   subject: `Rhizome membership — ${memberId} (LIVE via Cistern)`,
   claims: buildMembershipClaims(
     memberId,
-    policy ? { policy: { minVouches: policy.minVouches, freshnessDays: policy.freshnessDays } } : {},
+    policy
+      ? { policy: { minVouches: policy.minVouches, freshnessDays: policy.freshnessDays } }
+      : {},
   ),
   adapter,
   query: { subjectId: memberId },
@@ -82,6 +86,8 @@ for (const o of result.outcomes) {
   console.log(`      ${o.challengeEvidence}`);
 }
 const chk = verifyResult(result);
-console.log(`\n  re-verified offline — result ${chk.resultValid}, objections ${chk.objectionsValid}`);
+console.log(
+  `\n  re-verified offline — result ${chk.resultValid}, objections ${chk.objectionsValid}`,
+);
 console.log(bar);
 if (!chk.resultValid || !chk.objectionsValid) process.exit(1);

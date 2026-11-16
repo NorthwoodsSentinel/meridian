@@ -1,0 +1,10 @@
+# Generated output and lockfiles are never a gate target (AGENTS.md "Build output is never a gate target").
+node_modules/
+coverage/
+bun.lock
+.meridian-keys/
+.receipts/
+demo-output/
+.claude/
+# Markdown is prose, not code: prettier would rewrite it.
+*.md

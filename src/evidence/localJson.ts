@@ -23,12 +23,9 @@ type RawItem = {
 };
 
 type RawFile =
-  | RawItem[]
-  | { items?: RawItem[]; failures?: Array<{ source: string; reason: string }> };
+  RawItem[] | { items?: RawItem[]; failures?: Array<{ source: string; reason: string }> };
 
-export type LocalJsonSource =
-  | { filePath: string }
-  | { inline: RawFile };
+export type LocalJsonSource = { filePath: string } | { inline: RawFile };
 
 export class LocalJsonEvidenceAdapter implements EvidenceAdapter {
   readonly id = "local-json";

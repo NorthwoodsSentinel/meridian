@@ -36,12 +36,7 @@ export { Ed25519Signer, verifySignature, canonicalize, sha256Hex } from "./signi
 export type { Signer } from "./signing.ts";
 
 // Scoring
-export {
-  computeConfidenceScore,
-  meanClaimConfidence,
-  tallyVerdicts,
-  round2,
-} from "./scoring.ts";
+export { computeConfidenceScore, meanClaimConfidence, tallyVerdicts, round2 } from "./scoring.ts";
 export type { VerdictTally } from "./scoring.ts";
 
 // Execution log
@@ -65,18 +60,13 @@ export { LocalJsonEvidenceAdapter } from "./evidence/localJson.ts";
 export type { LocalJsonSource } from "./evidence/localJson.ts";
 
 // Rhizome-membership adapter (cooperative trust)
-export {
-  RhizomeMembershipAdapter,
-  buildMembershipClaims,
-} from "./evidence/rhizome.ts";
+export { RhizomeMembershipAdapter, buildMembershipClaims } from "./evidence/rhizome.ts";
 export type {
   MemberSubstrateSource,
   SelfReportedMetric,
   BuildMembershipClaimsOptions,
 } from "./evidence/rhizome.ts";
-export {
-  DEFAULT_MEMBERSHIP_POLICY,
-} from "./rhizome/types.ts";
+export { DEFAULT_MEMBERSHIP_POLICY } from "./rhizome/types.ts";
 // Live Cistern loader — the production wire (Cistern intake → Meridian trust)
 export { cisternMemberLoader } from "./evidence/cistern.ts";
 export type { CisternLoaderConfig } from "./evidence/cistern.ts";

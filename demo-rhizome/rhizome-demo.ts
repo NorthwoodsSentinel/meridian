@@ -43,7 +43,10 @@ const engine = new MeridianEngine({
 const bar = "═".repeat(72);
 const glyph: Record<string, string> = { verified: "✓", flagged: "✗", unresolved: "?" };
 
-async function runMember(file: string, selfReported: SelfReportedMetric[]): Promise<VerificationResult> {
+async function runMember(
+  file: string,
+  selfReported: SelfReportedMetric[],
+): Promise<VerificationResult> {
   const substrate = JSON.parse(readFileSync(join(here, file), "utf8")) as MemberSubstrate;
   const adapter = new RhizomeMembershipAdapter({ inline: substrate });
   const claims = buildMembershipClaims(substrate.memberId, { selfReported });
@@ -63,7 +66,10 @@ async function runMember(file: string, selfReported: SelfReportedMetric[]): Prom
   console.log(`  adapter     : ${result.adapterId}   strategy: ${result.strategyId}`);
   console.log(`  signer (pk) : ${result.signature.publicKey.slice(0, 32)}…`);
   console.log(bar);
-  const status = result.flaggedCount === 0 && result.unresolvedCount === 0 ? "MEMBER IN GOOD STANDING" : "NEEDS REVIEW";
+  const status =
+    result.flaggedCount === 0 && result.unresolvedCount === 0
+      ? "MEMBER IN GOOD STANDING"
+      : "NEEDS REVIEW";
   console.log(
     `  verified: ${result.verifiedCount}   flagged: ${result.flaggedCount}   unresolved: ${result.unresolvedCount}   ` +
       `→  TRUST SCORE: ${result.confidenceScore}   [${status}]`,
@@ -71,19 +77,27 @@ async function runMember(file: string, selfReported: SelfReportedMetric[]): Prom
   console.log(bar);
 
   for (const o of result.outcomes) {
-    console.log(`\n  [${glyph[o.verdict]}] ${o.verdict.toUpperCase()}  (${o.challengeType}, conf ${o.confidence})`);
+    console.log(
+      `\n  [${glyph[o.verdict]}] ${o.verdict.toUpperCase()}  (${o.challengeType}, conf ${o.confidence})`,
+    );
     console.log(`      claim   : ${o.claimText}`);
     console.log(`      finding : ${o.challengeEvidence}`);
     if (o.objection) console.log(`      objection: ${o.objection}`);
   }
 
-  console.log(`\n  signed objections (${result.signedObjections.length}) — detached ed25519 receipts:`);
+  console.log(
+    `\n  signed objections (${result.signedObjections.length}) — detached ed25519 receipts:`,
+  );
   for (const obj of result.signedObjections) {
-    console.log(`    • ${obj.claimId}  [${obj.challengeType}]  sig ${obj.signature.signature.slice(0, 24)}…`);
+    console.log(
+      `    • ${obj.claimId}  [${obj.challengeType}]  sig ${obj.signature.signature.slice(0, 24)}…`,
+    );
   }
 
   const check = verifyResult(result);
-  console.log(`\n  re-verified offline — result: ${check.resultValid}   objections: ${check.objectionsValid}`);
+  console.log(
+    `\n  re-verified offline — result: ${check.resultValid}   objections: ${check.objectionsValid}`,
+  );
   console.log(`  persisted receipt : demo-output/${result.runId}.json`);
   if (!check.resultValid || !check.objectionsValid) {
     console.error("SIGNATURE VERIFICATION FAILED");
@@ -118,6 +132,10 @@ const birch = await runMember("member-flagged.json", birchSelfReported);
 console.log(`\n${bar}`);
 console.log(`  SUMMARY`);
 console.log(bar);
-console.log(`  aspen  → trust score ${aspen.confidenceScore}  (${aspen.flaggedCount} flagged)  — carries a clean receipt.`);
-console.log(`  birch  → trust score ${birch.confidenceScore}  (${birch.flaggedCount} flagged)  — receipt shows the gaps.`);
+console.log(
+  `  aspen  → trust score ${aspen.confidenceScore}  (${aspen.flaggedCount} flagged)  — carries a clean receipt.`,
+);
+console.log(
+  `  birch  → trust score ${birch.confidenceScore}  (${birch.flaggedCount} flagged)  — receipt shows the gaps.`,
+);
 console.log(`${bar}\n`);
