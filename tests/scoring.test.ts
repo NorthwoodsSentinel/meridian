@@ -1,4 +1,4 @@
-import { describe, expect, test } from "bun:test";
+import { describe, expect, test } from "vitest";
 import {
   computeConfidenceScore,
   meanClaimConfidence,
@@ -71,10 +71,7 @@ describe("round2", () => {
 
 describe("meanClaimConfidence", () => {
   test("averages per-claim confidence", () => {
-    const outcomes = [
-      { confidence: 0.9 },
-      { confidence: 0.5 },
-    ] as ChallengeOutcome[];
+    const outcomes = [{ confidence: 0.9 }, { confidence: 0.5 }] as ChallengeOutcome[];
     expect(meanClaimConfidence(outcomes)).toBe(0.7);
   });
 

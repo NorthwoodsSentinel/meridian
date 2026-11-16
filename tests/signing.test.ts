@@ -1,13 +1,8 @@
-import { describe, expect, test } from "bun:test";
+import { describe, expect, test } from "vitest";
 import { mkdtempSync, readFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import {
-  canonicalize,
-  Ed25519Signer,
-  sha256Hex,
-  verifySignature,
-} from "../src/signing.ts";
+import { canonicalize, Ed25519Signer, sha256Hex, verifySignature } from "../src/signing.ts";
 
 describe("canonicalize", () => {
   test("is stable regardless of key insertion order", () => {

@@ -1,4 +1,4 @@
-import { describe, expect, test } from "bun:test";
+import { describe, expect, test } from "vitest";
 import { RuleBasedChallengeStrategy } from "../src/challenge/ruleBased.ts";
 import type { ChallengeContext } from "../src/challenge/strategy.ts";
 import { ExecutionLog } from "../src/log.ts";
@@ -30,8 +30,7 @@ function claim(partial: Partial<Claim> & Pick<Claim, "id" | "text">): Claim {
   return { selfReported: false, ...partial };
 }
 
-const daysAgo = (n: number): string =>
-  new Date(Date.now() - n * 24 * 60 * 60 * 1000).toISOString();
+const daysAgo = (n: number): string => new Date(Date.now() - n * 24 * 60 * 60 * 1000).toISOString();
 
 describe("RuleBasedChallengeStrategy — structured assertions", () => {
   test("exists → verified when field present", () => {

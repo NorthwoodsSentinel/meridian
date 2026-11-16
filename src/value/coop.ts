@@ -55,10 +55,11 @@ export function distributePayout(
   const players = contributors.map((c) => c.memberId);
 
   const phi = shapleyValues(players, (coalition) => valueFn(weightOf, coalition));
-  const total = players.reduce((sum, m) => sum + (phi[m] ?? 0), 0);
+  // `!`: shapleyValues sets an entry for every player, so these reads are never undefined.
+  const total = players.reduce((sum, m) => sum + phi[m]!, 0);
 
   return contributors.map((c) => {
-    const shapley = phi[c.memberId] ?? 0;
+    const shapley = phi[c.memberId]!;
     const share = total > 0 ? (shapley / total) * payout : 0;
     return { memberId: c.memberId, weight: c.weight, shapley, share };
   });

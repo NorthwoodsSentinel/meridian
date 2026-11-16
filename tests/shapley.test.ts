@@ -1,4 +1,4 @@
-import { test, expect } from "bun:test";
+import { test, expect } from "vitest";
 import { shapleyValues } from "../src/value/shapley.ts";
 import { additiveValue, quorumGatedValue, distributePayout } from "../src/value/coop.ts";
 

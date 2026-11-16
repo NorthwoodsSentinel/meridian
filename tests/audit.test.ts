@@ -1,4 +1,4 @@
-import { describe, expect, test } from "bun:test";
+import { describe, expect, test } from "vitest";
 import {
   EvidenceAuditAdapter,
   buildAuditClaims,
@@ -117,7 +117,11 @@ describe("controlToClaim (pure transform)", () => {
     expect(claim.id).toBe("SC-28");
     expect(claim.text).toBe("Encryption at rest enabled.");
     expect(claim.selfReported).toBe(false);
-    expect(claim.assertion).toEqual({ kind: "equals", field: "encryption_at_rest_enabled", value: true });
+    expect(claim.assertion).toEqual({
+      kind: "equals",
+      field: "encryption_at_rest_enabled",
+      value: true,
+    });
     expect(claim.attributes).toEqual({
       controlId: "SC-28",
       category: "encryption",
@@ -181,7 +185,9 @@ describe("buildAuditClaims", () => {
 describe("EvidenceAuditAdapter — normalization", () => {
   test("observed control → one EvidenceItem of the right kind carrying field=value at scan time", async () => {
     const set = compliantControlSet();
-    const bundle = await new EvidenceAuditAdapter({ inline: set }).collect({ subjectId: "acme-prod" });
+    const bundle = await new EvidenceAuditAdapter({ inline: set }).collect({
+      subjectId: "acme-prod",
+    });
 
     expect(bundle.adapterId).toBe("evidence-audit");
     expect(bundle.subjectId).toBe("acme-prod");
@@ -321,7 +327,7 @@ describe("end-to-end audit verification", () => {
     const gap = result.outcomes.find((o) => o.claimId === "SC-28")!;
     expect(gap.verdict).toBe("flagged");
     expect(gap.challengeType).toBe("contradicted");
-    expect(gap.objection).toBeString();
+    expect(gap.objection).toBeTypeOf("string");
     expect(result.signedObjections.some((o) => o.claimId === "SC-28")).toBe(true);
     // The signed objection is offline-verifiable.
     expect(verifyResult(result).objectionsValid).toBe(true);

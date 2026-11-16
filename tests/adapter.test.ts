@@ -1,4 +1,4 @@
-import { describe, expect, test } from "bun:test";
+import { describe, expect, test } from "vitest";
 import { mkdtempSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
@@ -15,15 +15,18 @@ describe("LocalJsonEvidenceAdapter", () => {
     expect(b.items).toHaveLength(1);
     const item = b.items[0]!;
     expect(item.kind).toBe("control-config");
-    expect(item.id).toBeString();
+    expect(item.id).toBeTypeOf("string");
     expect(item.source).toBe("local-json");
-    expect(item.observedAt).toBeString();
+    expect(item.observedAt).toBeTypeOf("string");
     expect(item.data).toEqual({ mfa_enabled: false });
   });
 
   test("reads bare-array form", async () => {
     const adapter = new LocalJsonEvidenceAdapter({
-      inline: [{ kind: "a", data: { x: 1 } }, { kind: "b", data: { y: 2 } }],
+      inline: [
+        { kind: "a", data: { x: 1 } },
+        { kind: "b", data: { y: 2 } },
+      ],
     });
     const b = await adapter.collect({ subjectId: "s2" });
     expect(b.items).toHaveLength(2);

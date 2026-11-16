@@ -1,4 +1,4 @@
-import { describe, expect, test } from "bun:test";
+import { describe, expect, test } from "vitest";
 import { mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
@@ -36,10 +36,30 @@ const evidence: EvidenceBundle = {
 };
 
 const claims: Claim[] = [
-  { id: "c1", text: "20+ commits", selfReported: false, assertion: { kind: "atLeast", field: "commits_90d", value: 20 } },
-  { id: "c2", text: "mfa enabled", selfReported: true, assertion: { kind: "equals", field: "mfa_enabled", value: true } },
-  { id: "c3", text: "99.9% uptime", selfReported: true, assertion: { kind: "atLeast", field: "uptime_pct", value: 99.9 } },
-  { id: "c4", text: "3 maintainers", selfReported: false, assertion: { kind: "equals", field: "contributor_count", value: 3 } },
+  {
+    id: "c1",
+    text: "20+ commits",
+    selfReported: false,
+    assertion: { kind: "atLeast", field: "commits_90d", value: 20 },
+  },
+  {
+    id: "c2",
+    text: "mfa enabled",
+    selfReported: true,
+    assertion: { kind: "equals", field: "mfa_enabled", value: true },
+  },
+  {
+    id: "c3",
+    text: "99.9% uptime",
+    selfReported: true,
+    assertion: { kind: "atLeast", field: "uptime_pct", value: 99.9 },
+  },
+  {
+    id: "c4",
+    text: "3 maintainers",
+    selfReported: false,
+    assertion: { kind: "equals", field: "contributor_count", value: 3 },
+  },
   { id: "c5", text: "integrates with our IdP", selfReported: true },
 ];
 
