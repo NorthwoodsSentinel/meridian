@@ -12,7 +12,7 @@ Meridian is a domain-agnostic adversarial-verification engine: a TypeScript libr
 
 - **Repo**: `NorthwoodsSentinel/meridian` (public)
 - **Issue tracker**: Linear, team key `NOR`
-- **Develop branch**: `main`. Cut feature branches from it; every PR targets it.
+- **Develop branch**: `master`. Cut feature branches from it; every PR targets it.
 
 ## Issue-driven work style
 
@@ -22,7 +22,7 @@ Meridian is a domain-agnostic adversarial-verification engine: a TypeScript libr
 - **`Backlog` means filed, not approved; `Todo` means approved by the owner.** An agent starts work only on a ticket in `Todo`.
 - **`Done` means the work shipped** (its PR merged, or it is a parent whose last sub-issue closed). Anything else is `Canceled` or `Duplicate`, never `Done`.
 - **When work begins**, assign the issue, set it **In Progress**, and create the feature branch in a new git worktree, never by switching branches in a shared checkout.
-- **When work is complete**, run `bun run format` then `bun run local:gate`, **sign off every commit** (`git commit -s`), open a PR against `main`, and set the ticket **In Review**.
+- **When work is complete**, run `bun run format` then `bun run local:gate`, **sign off every commit** (`git commit -s`), open a PR against `master`, and set the ticket **In Review**.
 - **After opening a PR, run a Codex review loop** (`codex exec --sandbox read-only`). Fix what it finds in the PR's own scope and run it again. Stop on the **first** clean round, with no confirming round. **Two failed rounds in a row: stop, leave the PR open, and list the open findings in it.** Decline scope expansion: pre-existing behavior and hardening the issue did not ask for become new issues, not more commits. (Departure: Cliff uses Copilot; the owner chose Codex as the off-lineage reviewer.)
 - **If new tasks are discovered during development, create issues.** They arrive in `Backlog`.
 - **Pace bulk GitHub writes: 1 s between requests, never in parallel.**
