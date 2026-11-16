@@ -1,3 +1,6 @@
+/**
+ * LocalJsonEvidenceAdapter: inline object and bare-array forms, declared failures, file paths, and a missing file recorded as a failure rather than a crash.
+ */
 import { describe, expect, test } from "vitest";
 import { mkdtempSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";

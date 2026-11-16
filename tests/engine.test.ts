@@ -1,3 +1,6 @@
+/**
+ * MeridianEngine.verify: the full loop (tallies, confidence score, signed objections, result signature, persistence) against a fixed evidence bundle.
+ */
 import { describe, expect, test } from "vitest";
 import { mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";

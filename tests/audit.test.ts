@@ -1,3 +1,6 @@
+/**
+ * Enterprise-audit adapter: the pure control -> evidence/claim/assertion transforms, then the adapter and engine end to end, so a control set yields a signed audit receipt.
+ */
 import { describe, expect, test } from "vitest";
 import {
   EvidenceAuditAdapter,

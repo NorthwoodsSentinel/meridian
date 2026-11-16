@@ -1,3 +1,6 @@
+/**
+ * Cistern loader: a mocked Cistern read API drives the loader, the Rhizome adapter and the engine end to end, including member filtering and auth failures.
+ */
 import { test, expect } from "vitest";
 import { cisternMemberLoader } from "../src/evidence/cistern.ts";
 import {

@@ -1,3 +1,6 @@
+/**
+ * Scoring: verdict tallies and the confidence-score formula (kredence parity), including the unresolved weight.
+ */
 import { describe, expect, test } from "vitest";
 import {
   computeConfidenceScore,

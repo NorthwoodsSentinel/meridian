@@ -1,3 +1,6 @@
+/**
+ * Rhizome membership: substrate -> evidence normalization and rollups, standard membership claims, and the engine's verdicts for passing and gaming members.
+ */
 import { describe, expect, test } from "vitest";
 import {
   RhizomeMembershipAdapter,

@@ -1,3 +1,6 @@
+/**
+ * Signing: canonical JSON, sha256, Ed25519Signer generate/load/persist, and offline signature verification.
+ */
 import { describe, expect, test } from "vitest";
 import { mkdtempSync, readFileSync } from "node:fs";
 import { tmpdir } from "node:os";

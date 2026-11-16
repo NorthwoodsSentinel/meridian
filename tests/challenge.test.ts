@@ -1,3 +1,6 @@
+/**
+ * RuleBasedChallengeStrategy: one test per assertion kind and verdict (verified, flagged, unresolved), plus the heuristic path for claims without an assertion.
+ */
 import { describe, expect, test } from "vitest";
 import { RuleBasedChallengeStrategy } from "../src/challenge/ruleBased.ts";
 import type { ChallengeContext } from "../src/challenge/strategy.ts";
