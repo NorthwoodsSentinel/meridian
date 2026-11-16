@@ -1,4 +1,7 @@
-import { describe, expect, test } from "bun:test";
+/**
+ * Rhizome membership: substrate -> evidence normalization and rollups, standard membership claims, and the engine's verdicts for passing and gaming members.
+ */
+import { describe, expect, test } from "vitest";
 import {
   RhizomeMembershipAdapter,
   buildMembershipClaims,
@@ -30,7 +33,12 @@ function wellVouchedSubstrate(): MemberSubstrate {
     peerAttestations: [
       { voucher: "cedar", subject: "aspen", statement: "reliable", observedAt: daysAgo(10) },
       { voucher: "willow", subject: "aspen", statement: "ships work", observedAt: daysAgo(20) },
-      { voucher: "sorrel", subject: "aspen", statement: "carried the rota", observedAt: daysAgo(5) },
+      {
+        voucher: "sorrel",
+        subject: "aspen",
+        statement: "carried the rota",
+        observedAt: daysAgo(5),
+      },
     ],
     contributionReceipts: [
       { what: "wrote the spec", receiptHash: "sha256:aaa", observedAt: daysAgo(9) },
@@ -43,7 +51,9 @@ function wellVouchedSubstrate(): MemberSubstrate {
 describe("RhizomeMembershipAdapter — normalization", () => {
   test("maps each substrate entry to an EvidenceItem of the right kind", async () => {
     const sub = wellVouchedSubstrate();
-    const bundle = await new RhizomeMembershipAdapter({ inline: sub }).collect({ subjectId: "aspen" });
+    const bundle = await new RhizomeMembershipAdapter({ inline: sub }).collect({
+      subjectId: "aspen",
+    });
 
     expect(bundle.adapterId).toBe("rhizome-membership");
     expect(bundle.subjectId).toBe("aspen");
@@ -74,7 +84,9 @@ describe("RhizomeMembershipAdapter — normalization", () => {
       contributionReceipts: [],
       participationLogs: [],
     };
-    const bundle = await new RhizomeMembershipAdapter({ inline: sub }).collect({ subjectId: "birch" });
+    const bundle = await new RhizomeMembershipAdapter({ inline: sub }).collect({
+      subjectId: "birch",
+    });
     const rollup = bundle.items.find((i) => i.source === "rhizome:vouch-rollup")!;
     expect(rollup.data.vouches).toBe(1);
     expect(rollup.data.derived).toBe(true);
@@ -97,7 +109,9 @@ describe("RhizomeMembershipAdapter — normalization", () => {
       contributionReceipts: [],
       participationLogs: [],
     };
-    const bundle = await new RhizomeMembershipAdapter({ inline: sub }).collect({ subjectId: "moss" });
+    const bundle = await new RhizomeMembershipAdapter({ inline: sub }).collect({
+      subjectId: "moss",
+    });
     const rollup = bundle.items.find((i) => i.source === "rhizome:contribution-rollup")!;
     expect(rollup.data.contribution_count).toBe(0);
     expect("last_contribution" in rollup.data).toBe(false);
@@ -138,7 +152,11 @@ describe("buildMembershipClaims", () => {
     const vouch = claims.find((c) => c.id === "aspen:vouches")!;
     const fresh = claims.find((c) => c.id === "aspen:freshness")!;
     expect(vouch.assertion).toEqual({ kind: "atLeast", field: "vouches", value: 3 });
-    expect(fresh.assertion).toEqual({ kind: "freshWithinDays", field: "last_contribution", days: 90 });
+    expect(fresh.assertion).toEqual({
+      kind: "freshWithinDays",
+      field: "last_contribution",
+      days: 90,
+    });
     // Peer-corroborated claims are not self-reported.
     expect(vouch.selfReported).toBe(false);
     expect(fresh.selfReported).toBe(false);
@@ -217,7 +235,7 @@ describe("end-to-end membership verification", () => {
     const flagged = result.outcomes.find((o) => o.claimId === "aspen:overclaim")!;
     expect(flagged.verdict).toBe("flagged");
     expect(flagged.challengeType).toBe("unsupported");
-    expect(flagged.objection).toBeString();
+    expect(flagged.objection).toBeTypeOf("string");
     // And it carries a signed objection receipt.
     expect(result.signedObjections.some((o) => o.claimId === "aspen:overclaim")).toBe(true);
   });
@@ -225,7 +243,9 @@ describe("end-to-end membership verification", () => {
   test("too few vouches flags the membership-threshold claim", async () => {
     const sub: MemberSubstrate = {
       memberId: "birch",
-      peerAttestations: [{ voucher: "cedar", subject: "birch", statement: "met once", observedAt: daysAgo(30) }],
+      peerAttestations: [
+        { voucher: "cedar", subject: "birch", statement: "met once", observedAt: daysAgo(30) },
+      ],
       contributionReceipts: [{ what: "typo fix", receiptHash: "sha256:z", observedAt: daysAgo(5) }],
       participationLogs: [],
     };
@@ -249,7 +269,9 @@ describe("end-to-end membership verification", () => {
         { voucher: "willow", subject: "birch", statement: "b", observedAt: daysAgo(11) },
         { voucher: "sorrel", subject: "birch", statement: "c", observedAt: daysAgo(12) },
       ],
-      contributionReceipts: [{ what: "old work", receiptHash: "sha256:old", observedAt: daysAgo(175) }],
+      contributionReceipts: [
+        { what: "old work", receiptHash: "sha256:old", observedAt: daysAgo(175) },
+      ],
       participationLogs: [],
     };
     const result = await runVerification({

@@ -7,7 +7,7 @@
  * These property tests fail against that old behavior (the count-tamper case
  * especially — counts weren't even signed) and pass against the redesign.
  */
-import { test, expect } from "bun:test";
+import { test, expect } from "vitest";
 import { Ed25519Signer } from "../src/signing.ts";
 import { buildResultDigest } from "../src/engine.ts";
 import { verifyResult } from "../src/verify.ts";
@@ -104,7 +104,12 @@ test("the exact council example: score 1.0 over all-flagged outcomes cannot veri
   const signer = Ed25519Signer.generate();
   const r = makeSignedResult(["flagged", "flagged", "flagged"], 0.5, signer);
   expect(r.confidenceScore).toBe(0); // honest score for all-flagged
-  const lied: VerificationResult = { ...r, confidenceScore: 1.0, verifiedCount: 3, flaggedCount: 0 };
+  const lied: VerificationResult = {
+    ...r,
+    confidenceScore: 1.0,
+    verifiedCount: 3,
+    flaggedCount: 0,
+  };
   expect(verifyResult(lied).resultValid).toBe(false);
 });
 

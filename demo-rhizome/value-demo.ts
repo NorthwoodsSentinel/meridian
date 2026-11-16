@@ -10,7 +10,12 @@
  * choice is visible: additive (proportional) vs quorum-gated (rewards reaching
  * critical mass).
  */
-import { distributePayout, additiveValue, quorumGatedValue, type Contributor } from "../src/index.ts";
+import {
+  distributePayout,
+  additiveValue,
+  quorumGatedValue,
+  type Contributor,
+} from "../src/index.ts";
 
 const contributors: Contributor[] = [
   { memberId: "aspen", weight: 6 }, // many verified contributions
@@ -26,7 +31,9 @@ function show(title: string, shares: ReturnType<typeof distributePayout>) {
   let total = 0;
   for (const s of shares.sort((a, b) => b.share - a.share)) {
     total += s.share;
-    console.log(`  ${s.memberId.padEnd(10)} weight ${String(s.weight).padStart(2)}  →  $${s.share.toFixed(2)}`);
+    console.log(
+      `  ${s.memberId.padEnd(10)} weight ${String(s.weight).padStart(2)}  →  $${s.share.toFixed(2)}`,
+    );
   }
   console.log(`  ${"".padEnd(10)}                Σ = $${total.toFixed(2)}  (efficiency: = payout)`);
 }
@@ -34,8 +41,14 @@ function show(title: string, shares: ReturnType<typeof distributePayout>) {
 console.log(bar);
 console.log(`  RHIZOME VALUE ROUTING — Shapley split of a $${PAYOUT} payout`);
 console.log(bar);
-show("ADDITIVE value (proportional to verified contribution):", distributePayout(PAYOUT, contributors, additiveValue));
-show("QUORUM-GATED value (co-op needs ≥3 members to produce): ", distributePayout(PAYOUT, contributors, quorumGatedValue(3)));
+show(
+  "ADDITIVE value (proportional to verified contribution):",
+  distributePayout(PAYOUT, contributors, additiveValue),
+);
+show(
+  "QUORUM-GATED value (co-op needs ≥3 members to produce): ",
+  distributePayout(PAYOUT, contributors, quorumGatedValue(3)),
+);
 console.log(`\n${bar}`);
 console.log("  Same contributors, two value functions, two fair splits — each the");
 console.log("  unique Shapley allocation for its rules. The value function is the");

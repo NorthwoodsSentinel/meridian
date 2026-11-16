@@ -53,11 +53,6 @@ export type MemberSubstrateSource =
   | { filePath: string }
   | { load: (subjectId: string) => MemberSubstrate | Promise<MemberSubstrate> };
 
-/** Empty-but-valid substrate, used when a source fails so the run still completes. */
-function emptySubstrate(memberId: string): MemberSubstrate {
-  return { memberId, peerAttestations: [], contributionReceipts: [], participationLogs: [] };
-}
-
 /** Most recent ISO timestamp in a list, or undefined if the list is empty. */
 function latestIso(times: string[]): string | undefined {
   let best: { iso: string; ms: number } | undefined;
@@ -228,7 +223,11 @@ export function buildMembershipClaims(
       id: `${memberId}:freshness`,
       text: `The member has a contribution within the last ${policy.freshnessDays} days.`,
       selfReported: false,
-      assertion: { kind: "freshWithinDays", field: "last_contribution", days: policy.freshnessDays },
+      assertion: {
+        kind: "freshWithinDays",
+        field: "last_contribution",
+        days: policy.freshnessDays,
+      },
       attributes: { memberId, check: "activity-freshness" },
     },
   ];

@@ -1,4 +1,7 @@
-import { test, expect } from "bun:test";
+/**
+ * Shapley value routing: the axioms (efficiency, symmetry, null player), the additive baseline, and the quorum-gated payout split.
+ */
+import { test, expect } from "vitest";
 import { shapleyValues } from "../src/value/shapley.ts";
 import { additiveValue, quorumGatedValue, distributePayout } from "../src/value/coop.ts";
 

@@ -214,7 +214,11 @@ export function buildAuditClaims(controlSet: ControlSet): Claim[] {
         id: control.id,
         text: control.name,
         selfReported: control.selfReported ?? false,
-        attributes: { controlId: control.id, category: control.category, check: "security-control" },
+        attributes: {
+          controlId: control.id,
+          category: control.category,
+          check: "security-control",
+        },
       };
     }
   });

@@ -54,11 +54,9 @@ export class Ed25519Signer implements Signer {
   readonly algorithm = "ed25519" as const;
   readonly publicKeyBase64: string;
   #privateKey: KeyObject;
-  #publicKey: KeyObject;
 
   private constructor(privateKey: KeyObject, publicKey: KeyObject) {
     this.#privateKey = privateKey;
-    this.#publicKey = publicKey;
     this.publicKeyBase64 = publicKey.export({ type: "spki", format: "der" }).toString("base64");
   }
 

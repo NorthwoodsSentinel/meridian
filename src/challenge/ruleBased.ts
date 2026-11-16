@@ -172,7 +172,8 @@ export class RuleBasedChallengeStrategy implements ChallengeStrategy {
             objection: `Cannot evaluate: the claim's match pattern "${assertion.pattern}" is invalid.`,
           });
         }
-        const tested = value.length > MAX_MATCH_VALUE_LENGTH ? value.slice(0, MAX_MATCH_VALUE_LENGTH) : value;
+        const tested =
+          value.length > MAX_MATCH_VALUE_LENGTH ? value.slice(0, MAX_MATCH_VALUE_LENGTH) : value;
         return re.test(tested)
           ? this.#make(claim, "verified", "contradicted", CONFIDENCE.verified, {
               challengeEvidence: `Pattern matched: ${cite} matches /${assertion.pattern}/.`,
@@ -228,12 +229,7 @@ export class RuleBasedChallengeStrategy implements ChallengeStrategy {
     });
   }
 
-  #typeMismatch(
-    claim: Claim,
-    field: string,
-    value: unknown,
-    expected: string,
-  ): ChallengeOutcome {
+  #typeMismatch(claim: Claim, field: string, value: unknown, expected: string): ChallengeOutcome {
     return this.#make(claim, "unresolved", "vague", CONFIDENCE.typeMismatch, {
       challengeEvidence: `Type mismatch: ${field}=${JSON.stringify(value)} is not ${expected}, so the assertion cannot be evaluated.`,
       objection: `Cannot evaluate: evidence field ${field} is ${JSON.stringify(value)}, but a ${expected} value is required to test this claim.`,

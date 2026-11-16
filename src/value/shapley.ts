@@ -60,7 +60,7 @@ export function shapleyValues(
     for (let i = 0; i < n; i++) {
       if ((mask & (1 << i)) !== 0) continue; // i ∉ S; measure i's marginal on S = mask
       const marginal = vOf(mask | (1 << i)) - vOf(mask);
-      phi[players[i]!] = (phi[players[i]!] ?? 0) + weight * marginal;
+      phi[players[i]!] = phi[players[i]!]! + weight * marginal; // every player was set to 0 above
     }
   }
   return phi;

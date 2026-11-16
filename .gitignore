@@ -5,3 +5,4 @@ demo-output/
 node_modules/
 
 .claude/
+coverage/
